@@ -1,0 +1,71 @@
+// This tells Prisma to use the client we installed
+generator client {
+  provider = "prisma-client-js"
+}
+
+// This tells Prisma to connect to our Render database
+// using the URL we stored in our .env file.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model, based on spec [cite: 23]
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  role          String   @default("user") // "user" | "admin"
+  created_at    DateTime @default(now()) @map("created_at")
+
+  // This defines the one-to-many relationship: One User can have many Orders
+  orders UserOrder[]
+}
+
+// Product model, based on spec [cite: 23-24]
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  image_url   String?
+  price_cents Int
+  currency    String   @default("INR")
+  stock       Int      @default(0)
+  created_at  DateTime @default(now()) @map("created_at")
+  updated_at  DateTime @updatedAt @map("updated_at")
+
+  // This defines the relationship: One Product can be in many OrderItems
+  orderItems OrderItem[]
+}
+
+// Order model, based on spec [cite: 24]
+model UserOrder {
+  id                String   @id @default(uuid())
+  user_id           String
+  stripe_session_id String?  @unique @map("stripe_session_id")
+  status            String   @default("pending") // pending | paid | failed
+  amount_cents      Int
+  currency          String   @default("INR")
+  created_at        DateTime @default(now()) @map("created_at")
+
+  // Establishes the foreign key relationship back to the User
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  // This defines the relationship: One Order can have many OrderItems
+  items OrderItem[]
+}
+
+// OrderItem model (join table), based on spec [cite: 24-25]
+model OrderItem {
+  id               String @id @default(uuid())
+  order_id         String
+  product_id       String
+  quantity         Int
+  unit_price_cents Int    @map("unit_price_cents")
+
+  // Establishes the foreign key relationship back to the Order
+  order UserOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  // Establishes the relationship back to the Product
+  product Product @relation(fields: [product_id], references: [id])
+}

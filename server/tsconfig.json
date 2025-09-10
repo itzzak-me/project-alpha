@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext"],
+
+    /* Where our code and builds live */
+    "outDir": "./dist",
+    "rootDir": "./src",
+
+    /* Module settings */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Strictness */
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"], // Only compile files inside the src folder
+  "exclude": ["node_modules"]
+}

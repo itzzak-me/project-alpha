@@ -1,0 +1,11 @@
+# Ignore Node dependencies
+node_modules/
+dist/
+
+# Ignore secret environment files
+.env
+*.env.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
